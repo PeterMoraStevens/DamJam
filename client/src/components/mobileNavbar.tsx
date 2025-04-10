@@ -1,10 +1,12 @@
 import React from "react";
 import { Button } from "./ui/button";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useAuth } from "../../hooks/useAuth";
 import { GiBeaver } from "react-icons/gi";
+import { auth } from "firebase/initialize";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 
@@ -14,7 +16,7 @@ const SignedInMobileNavbar = () => {
       <div className="flex">
         <Popover>
           <PopoverTrigger asChild>
-            <Button className="mr-6 cursor-pointer">
+            <Button className="mr-6 cursor-pointer" size={"icon"}>
               <RxHamburgerMenu />
             </Button>
           </PopoverTrigger>
@@ -64,36 +66,47 @@ const SignedInMobileNavbar = () => {
         </div>
       </div>
       <div className="flex-1 ml-6">
-        <Button>
-          <GiBeaver />
-        </Button>
+        <NavLink to="/">
+          <Button size={"icon"}>
+            <GiBeaver />
+          </Button>
+        </NavLink>
       </div>
     </div>
   );
 };
 
 const SignedOutMobileNavbar = () => {
+  const { user } = useAuth();
+  const url: string = useLocation().pathname;
+
   return (
     <div className="top-0 fixed absolute h-[65px] w-full bg-[var(--color-secondary-background)] border-b-2 flex flex-row-reverse items-center z-99">
       <div className="flex">
-        <div className="mr-6">
-          <NavLink to={"/signin"}>
-            <Button>Sign In</Button>
-          </NavLink>
-        </div>
+        {(!user && url=="/signin") || (
+          <div className="mr-6">
+            <NavLink to={"/signin"}>
+              <Button>Sign In</Button>
+            </NavLink>
+          </div>
+        )}
       </div>
       <div className="flex-1 ml-6">
-        <Button>
-          <GiBeaver />
-        </Button>
+        <NavLink to="/">
+          <Button size={"icon"}>
+            <GiBeaver />
+          </Button>
+        </NavLink>
       </div>
     </div>
   );
 };
 
 const MobileNavbar = () => {
+  const { user } = useAuth();
+
   // update to only show if user session is signed in
-  if (false) {
+  if (user) {
     return <SignedInMobileNavbar />;
   }
   return <SignedOutMobileNavbar />;

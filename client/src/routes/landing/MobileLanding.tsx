@@ -22,7 +22,7 @@ export const MobileLanding = () => {
                   duration: 2,
                   ease: "easeInOut",
                 }}
-                className="absolute -bottom-6 -right-6 bg-opacity-25 bg-[var(--color-secondary-background)] border border-1 rounded-full"
+                className="absolute -bottom-6 -right-6 bg-secondary-background/50 border border-1 rounded-full"
               >
                 <IoMdMusicalNote />
               </motion.div>
@@ -34,7 +34,7 @@ export const MobileLanding = () => {
                   duration: 2,
                   ease: "easeInOut",
                 }}
-                className="absolute -top-6 -left-6 bg-opacity-25 bg-[var(--color-secondary-background)] border border-1 rounded-full"
+                className="absolute -top-6 -left-6 bg-secondary-background/50 border border-1 rounded-full"
               >
                 <IoMdMusicalNote />
               </motion.div>
