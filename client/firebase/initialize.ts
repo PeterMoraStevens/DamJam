@@ -1,21 +1,16 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import {
   getAuth,
   GoogleAuthProvider,
+  OAuthProvider,
   signInWithPopup,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendEmailVerification,
   signOut,
+  type User,
 } from "firebase/auth";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDNxfZiWu1NPMNHCOm00nXWVmS1ZEb6Z_0",
   authDomain: "damjam-61f6c.firebaseapp.com",
@@ -26,21 +21,39 @@ const firebaseConfig = {
   measurementId: "G-8WK745YTPT",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider();
+const appleProvider = new OAuthProvider("apple.com");
 
+// Google Sign-In
 const googleLogin = async () => {
   try {
-    const result = await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, googleProvider);
     return result.user;
   } catch (error: any) {
-    console.error(error);
+    console.error("Google Sign-In Error:", error.message);
+    return "Google Sign-In Error: " + error.message;
   }
 };
 
-async function signUp(email: string, password: string) {
+// Apple Sign-In
+const appleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, appleProvider);
+    return result.user;
+  } catch (error: any) {
+    console.error("Apple Sign-In Error:", error.message);
+    return "Apple Sign-In Error:" + error.message;
+  }
+};
+
+// Email Sign-Up with Password Strength
+const signUp = async (email: string, password: string) => {
+  if (password.length < 8 || !/\d/.test(password) || !/[A-Z]/.test(password)) {
+    return "Password must be at least 8 characters long and include a number and an uppercase letter.";
+  }
+
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -48,12 +61,14 @@ async function signUp(email: string, password: string) {
       password
     );
     await sendEmailVerification(userCredential.user);
-    alert("Verification email sent! Please check your inbox.");
+    return "Verification email sent! Please check your inbox";
   } catch (error: any) {
-    console.error("Error signing up:", error.message);
+    console.error("Sign-Up Error:", error.message);
+    return "Sign-Up Error:" + error.message;
   }
-}
+};
 
+// Email Sign-In with Verification Check
 const emailLogin = async (email: string, password: string) => {
   try {
     const userCredential = await signInWithEmailAndPassword(
@@ -61,14 +76,25 @@ const emailLogin = async (email: string, password: string) => {
       email,
       password
     );
-    return userCredential.user;
+    const user: User = userCredential.user;
+
+    if (!user.emailVerified) {
+      return "Please verify your email before logging in.";
+    }
+    return user;
   } catch (error: any) {
-    console.error(error.message);
+    console.error("Login Error:", error.message);
+    return "Login Error:" + error.message;
   }
 };
 
+// Logout
 const logout = async () => {
-  await signOut(auth);
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Logout Error:", error);
+  }
 };
 
-export { auth, googleLogin, signUp, emailLogin, logout };
+export { auth, googleLogin, appleLogin, signUp, emailLogin, logout };
